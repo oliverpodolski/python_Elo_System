@@ -44,3 +44,65 @@ class DatabaseManager:
             );
             """
         )
+
+    def create_player(self, player_name):
+        self.cursor.execute(
+            """
+            INSERT INTO players (name, elo)
+            VALUES (%s, %s)
+            """,(player_name, 1000)
+        )
+        self.connection.commit()
+
+    def remove_player(self, player_id):
+        self.cursor.execute(
+            """
+            DELETE FROM players
+            WHERE id = %s
+            """, (player_id,)
+        )
+
+        self.connection.commit()
+
+    def get_players(self):
+        self.cursor.execute(
+            """
+            SELECT * FROM players
+            """
+        )
+        return self.cursor.fetchall()
+
+    def get_player(self, player_id):
+        self.cursor.execute(
+            """
+            SELECT * FROM players
+            WHERE id = %s
+            """,(player_id,)
+        )
+        player = self.cursor.fetchone()
+        if player is None:
+            return None
+        return {
+            "id": player[0],
+            "name": player[1],
+            "elo": player[2]
+        }
+
+    def create_match(self, winnerID, loserID, elo_change):
+        self.cursor.execute(
+            """
+            INSERT INTO matches (winnerID, loserID, elo_change)
+            VALUES (%s, %s, %s)
+            """, (winnerID, loserID, elo_change)
+        )
+        self.connection.commit()
+
+    def update_elo(self, new_elo, player_id):
+        self.cursor.execute(
+            """
+            UPDATE players
+            SET elo = %s
+            WHERE id = %s
+            """,(new_elo, player_id)
+        )
+        self.connection.commit()
