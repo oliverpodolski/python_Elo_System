@@ -116,3 +116,13 @@ class DatabaseManager:
             """
         )
         return self.cursor.fetchall()
+
+    def get_matches(self, player_id):
+        self.cursor.execute(
+            """
+            SELECT * FROM matches
+            WHERE winnerID = %s OR loserID = %s
+            ORDER BY entry_added_at DESC
+            """, (player_id, player_id)
+        )
+        return self.cursor.fetchall()

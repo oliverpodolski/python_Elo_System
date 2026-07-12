@@ -1,3 +1,5 @@
+from enum import nonmember
+
 from database.db import DatabaseManager
 from elo import EloCalculator
 
@@ -15,6 +17,7 @@ def start_menu():
         print("3 - Show Player List")
         print("4 - Add Match")
         print("5 - Leaderboard")
+        print("6 - Match History")
 
         try:
             choice = int(input("\nWhat would you like to do?\n"))
@@ -29,7 +32,11 @@ def start_menu():
                 db.create_player(player)
                 print("Player was created")
         elif choice == 2:
-            db.remove_player(input("Enter the id of the player:\n"))
+            try:
+                player_remove = int(input("Enter the id of the player:\n"))
+            except ValueError:
+                print("Please enter a valid number!")
+            db.remove_player(player_remove)
             print("Player was removed")
         elif choice == 3:
             player_playerlist = db.get_players()
@@ -56,4 +63,21 @@ def start_menu():
             for p in player_leaderboard:
                 print(f"ID: {p[0]} | Name: {p[1]} | Elo: {p[2]}")
             print("\n")
+        elif choice == 6:
+            try:
+                player_match_history = int(input("Enter the id of the player:\n"))
+            except ValueError:
+                print("Please enter a valid number!")
+            player_matches = db.get_matches(player_match_history)
+            if not player_matches:
+                print("This player does not exists or haven´t played a match!")
+            else:
+                matches = len(player_matches)
+                for m in player_matches:
+                    player_winner = db.get_player(m[1])
+                    player_loser = db.get_player(m[2])
+                    print(f"Match #{matches}")
+                    print(f"{player_winner["name"]} defeated {player_loser["name"]} (+/-{m[3]})")
+                    print(f"{m[4]}\n")
+                    matches -= 1
 start_menu()
