@@ -14,7 +14,7 @@ def start_menu():
         print("2 - Remove Player")
         print("3 - Show Player List")
         print("4 - Add Match")
-        print("5 - Ranklist")
+        print("5 - Leaderboard")
 
         try:
             choice = int(input("\nWhat would you like to do?\n"))
@@ -28,14 +28,17 @@ def start_menu():
             else:
                 db.create_player(player)
                 print("Player was created")
-        if choice == 2:
+        elif choice == 2:
             db.remove_player(input("Enter the id of the player:\n"))
             print("Player was removed")
-        if choice == 3:
-            print(db.get_players())
-        if choice == 4:
-            winner_id = input("Enter the player ID of the winner")
-            loser_id = input("Enter the player ID of the loser")
+        elif choice == 3:
+            player_playerlist = db.get_players()
+            for i in player_playerlist:
+                print(f"ID: {i[0]} | Name: {i[1]} | Elo: {i[2]}")
+            print("\n")
+        elif choice == 4:
+            winner_id = input("Enter the player ID of the winner\n")
+            loser_id = input("Enter the player ID of the loser\n")
 
             winner = db.get_player(winner_id)
             loser = db.get_player(loser_id)
@@ -46,7 +49,11 @@ def start_menu():
             db.update_elo(loser["elo"] - elo_change, loser_id)
 
             db.create_match(winner["id"], loser["id"], elo_change)
-            print(f"Match was created! The elo change is: {elo_change}")
+            print(f"Match was created! The elo change is: {elo_change}\n")
+        elif choice == 5:
+            player_leaderboard = db.get_leaderboard()
 
-
+            for p in player_leaderboard:
+                print(f"ID: {p[0]} | Name: {p[1]} | Elo: {p[2]}")
+            print("\n")
 start_menu()

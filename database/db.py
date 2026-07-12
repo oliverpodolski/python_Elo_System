@@ -106,3 +106,13 @@ class DatabaseManager:
             """,(new_elo, player_id)
         )
         self.connection.commit()
+
+    def get_leaderboard(self):
+        self.cursor.execute(
+            """
+            SELECT * FROM players
+            ORDER BY elo DESC
+            LIMIT 10
+            """
+        )
+        return self.cursor.fetchall()
