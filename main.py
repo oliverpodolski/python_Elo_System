@@ -1,5 +1,3 @@
-from enum import nonmember
-
 from database.db import DatabaseManager
 from elo import EloCalculator
 
@@ -18,6 +16,7 @@ def start_menu():
         print("4 - Add Match")
         print("5 - Leaderboard")
         print("6 - Match History")
+        print("7 - Player Stats")
 
         try:
             choice = int(input("\nWhat would you like to do?\n"))
@@ -80,4 +79,27 @@ def start_menu():
                     print(f"{player_winner["name"]} defeated {player_loser["name"]} (+/-{m[3]})")
                     print(f"{m[4]}\n")
                     matches -= 1
+        elif choice == 7:
+            try:
+                player_stats = int(input("Enter the id of the player:\n"))
+            except ValueError:
+                print("Please enter a valid number!")
+            wins = db.get_stats_wins(player_stats)
+            losses = db.get_stats_losses(player_stats)
+            player_info = db.get_player(player_stats)
+            elo = player_info["elo"]
+            name = player_info["name"]
+            matches_stats = losses + wins
+            win_rate = (wins / matches_stats) * 100
+
+            print("STATS\n")
+            print(name)
+            print(f"\nCurrent Elo: {elo}")
+            print(f"Matches: {matches_stats}")
+            print(f"Wins: {wins}")
+            print(f"Losses: {losses}")
+            print(f"Win Rate: {win_rate}\n")
+
+
+
 start_menu()

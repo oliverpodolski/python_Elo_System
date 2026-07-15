@@ -126,3 +126,23 @@ class DatabaseManager:
             """, (player_id, player_id)
         )
         return self.cursor.fetchall()
+
+    def get_stats_wins(self, player_id):
+        self.cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM matches
+            WHERE winnerID = %s
+            """, (player_id,)
+        )
+        return self.cursor.fetchone()[0]
+
+    def get_stats_losses(self, player_id):
+        self.cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM matches
+            WHERE loserID = %s
+            """, (player_id,)
+        )
+        return self.cursor.fetchone()[0]
