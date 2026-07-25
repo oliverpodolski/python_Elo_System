@@ -43,19 +43,31 @@ def start_menu():
                 print(f"ID: {i[0]} | Name: {i[1]} | Elo: {i[2]}")
             print("\n")
         elif choice == 4:
-            winner_id = input("Enter the player ID of the winner\n")
-            loser_id = input("Enter the player ID of the loser\n")
+            try:
+                winner_id = int(input("Enter the player ID of the winner\n"))
+            except ValueError:
+                print("Please enter a valid number!")
+                continue
+            try:
+                loser_id = int(input("Enter the player ID of the loser\n"))
+            except ValueError:
+                print("Please enter a valid number!")
+                continue
+            if not winner_id == loser_id:
+                winner = db.get_player(winner_id)
+                loser = db.get_player(loser_id)
+                if winner is not None and loser is not None:
+                    elo_change = elo.calculate(winner["elo"], loser["elo"])
 
-            winner = db.get_player(winner_id)
-            loser = db.get_player(loser_id)
+                    db.update_elo(winner["elo"] + elo_change, winner_id)
+                    db.update_elo(loser["elo"] - elo_change, loser_id)
 
-            elo_change = elo.calculate(winner["elo"], loser["elo"])
-
-            db.update_elo(winner["elo"] + elo_change, winner_id)
-            db.update_elo(loser["elo"] - elo_change, loser_id)
-
-            db.create_match(winner["id"], loser["id"], elo_change)
-            print(f"Match was created! The elo change is: {elo_change}\n")
+                    db.create_match(winner["id"], loser["id"], elo_change)
+                    print(f"Match was created! The elo change is: {elo_change}\n")
+                else:
+                    print("player/players do not exists.\n")
+            else:
+                print("Winner and loser cannot be the same player!")
         elif choice == 5:
             player_leaderboard = db.get_leaderboard()
 
@@ -84,17 +96,24 @@ def start_menu():
                 player_stats = int(input("Enter the id of the player:\n"))
             except ValueError:
                 print("Please enter a valid number!")
+                continue
             wins = db.get_stats_wins(player_stats)
             losses = db.get_stats_losses(player_stats)
             player_info = db.get_player(player_stats)
-            elo = player_info["elo"]
+            if player_info is None:
+                print("Player does not exists.")
+                continue
+            player_elo = player_info["elo"]
             name = player_info["name"]
             matches_stats = losses + wins
-            win_rate = (wins / matches_stats) * 100
+            if matches_stats == 0:
+                win_rate = 0
+            else:
+                win_rate = (wins / matches_stats) * 100
 
             print("STATS\n")
             print(name)
-            print(f"\nCurrent Elo: {elo}")
+            print(f"\nCurrent Elo: {player_elo}")
             print(f"Matches: {matches_stats}")
             print(f"Wins: {wins}")
             print(f"Losses: {losses}")
